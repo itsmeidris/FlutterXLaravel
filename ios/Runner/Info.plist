@@ -45,5 +45,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+	    <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs access to your photo library to upload profile images.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs access to your camera to take pictures.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs access to your microphone if you record videos.</string>
+
 </dict>
 </plist>

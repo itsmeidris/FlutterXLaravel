@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laravel_demo_app/controllers/student_controller.dart';
 import 'package:laravel_demo_app/views/widgets/student_card.dart';
+import 'package:laravel_demo_app/views/widgets/student_dialog.dart';
+import 'package:laravel_demo_app/views/widgets/student_dialog_update.dart';
 
 class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});
@@ -89,6 +91,14 @@ class StudentsScreen extends StatelessWidget {
                   return StudentCard(
                     student: student,
                     onDelete: () => studentController.deleteStudent(student.id),
+                    onUpdate: () {
+                      studentDialogUpdate(context, student);
+
+                      debugPrint(
+                        "Student ID : ${studentController.students[index].id}",
+                      );
+                      //studentController.students[index];
+                    },
                   );
                 },
               ),
@@ -97,7 +107,9 @@ class StudentsScreen extends StatelessWidget {
         );
       }),
       floatingActionButton: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          studentDialog(context, studentController);
+        },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
           backgroundColor: Colors.blue,

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:laravel_demo_app/models/student.dart';
@@ -11,12 +12,19 @@ class StudentController extends GetxController {
   RxList<Student> students = <Student>[].obs;
   RxBool isLoading = false.obs;
 
+  //Student data
+  RxString stdName = 'Student name'.obs;
+  RxString stdEmail = 'Student email'.obs;
+  RxInt stdMark = 0.obs;
+  File? stdImage;
+
   @override
   void onInit() {
     getStudents();
     super.onInit();
   }
 
+  //Get all students
   Future<void> getStudents() async {
     try {
       isLoading.value = true;
@@ -29,6 +37,7 @@ class StudentController extends GetxController {
     }
   }
 
+  //Delete a student
   Future<void> deleteStudent(int id) async {
     try {
       isLoading.value = true;
@@ -41,6 +50,38 @@ class StudentController extends GetxController {
     } catch (e) {
       debugPrint('Error');
       Get.snackbar("Error", "Could not delete student");
+    }
+  }
+
+  //Create new student
+  Future<void> createStudent({
+    required String name,
+    required String email,
+    required int mark,
+    File? profileImage,
+  }) async {
+    try {
+      isLoading.value = true;
+      final result = await _apiService.createStudent(
+        name: name,
+        email: email,
+        mark: mark,
+        image: profileImage,
+      );
+      if (result["success"] == true) {
+        isLoading.value = false;
+        final newStudent = Student.fromJson(result['student']);
+        students.add(newStudent);
+        update();
+      } else {
+        isLoading.value = false;
+
+        debugPrint(result["error"]);
+      }
+    } catch (e) {
+      isLoading.value = false;
+
+      debugPrint("Error while creating a student : $e");
     }
   }
 }
