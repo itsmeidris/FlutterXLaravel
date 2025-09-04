@@ -8,6 +8,13 @@ class StudentController extends GetxController {
   //API SERVICE
   final ApiService _apiService = ApiService();
 
+  //Reactive controllers
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final markController = TextEditingController();
+  final passwordController = TextEditingController();
+  File? profileImage;
+
   //REACTIVE DATA
   RxList<Student> students = <Student>[].obs;
   RxBool isLoading = false.obs;
@@ -16,12 +23,22 @@ class StudentController extends GetxController {
   RxString stdName = 'Student name'.obs;
   RxString stdEmail = 'Student email'.obs;
   RxInt stdMark = 0.obs;
+  RxBool isRegistered = false.obs;
   File? stdImage;
 
   @override
   void onInit() {
     getStudents();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    markController.dispose();
+    nameController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 
   //Get all students
@@ -70,6 +87,40 @@ class StudentController extends GetxController {
       );
       if (result["success"] == true) {
         isLoading.value = false;
+        final newStudent = Student.fromJson(result['student']);
+        students.add(newStudent);
+        update();
+      } else {
+        isLoading.value = false;
+
+        debugPrint(result["error"]);
+      }
+    } catch (e) {
+      isLoading.value = false;
+
+      debugPrint("Error while creating a student : $e");
+    }
+  }
+
+  Future<void> registerStudent({
+    required String name,
+    required String email,
+    required String password,
+    required int mark,
+    File? profileImage,
+  }) async {
+    try {
+      isLoading.value = true;
+      final result = await _apiService.registerStudent(
+        name: name,
+        email: email,
+        password: password,
+        mark: mark,
+        image: profileImage,
+      );
+      if (result["success"] == true) {
+        isLoading.value = false;
+        isRegistered.value = true;
         final newStudent = Student.fromJson(result['student']);
         students.add(newStudent);
         update();

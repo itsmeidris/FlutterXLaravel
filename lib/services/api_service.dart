@@ -94,4 +94,70 @@ class ApiService {
       return {'success': false, 'errors': 'Invalid response from server'};
     }
   }
+
+  //Update a student
+  /* Future<void> updateStudent(){
+    
+  } */
+
+  //Sign up service
+  Future<Map<String, dynamic>> registerStudent({
+    required String name,
+    required String email,
+    required String password,
+    required int mark,
+    File? image,
+  }) async {
+    //For sending images
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiRoutes.registerUrl),
+    );
+
+    //Add fields
+    request.fields['name'] = name;
+    request.fields['email'] = email;
+    request.fields['password'] = password;
+    request.fields['mark'] = mark.toString();
+
+    //Set image extensions
+    final ext = path
+        .extension(image!.path)
+        .toLowerCase()
+        .replaceAll('.', ''); // e.g., 'png', 'jpg'
+    final mimeType = MediaType('image', ext);
+    //Add image is exists
+    if (image != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profile_image',
+          image.path,
+          contentType: mimeType,
+        ),
+      );
+    }
+
+    //Get response
+    final response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    // Print the raw response from the server
+    debugPrint("Server response: $responseString");
+    try {
+      final jsonResponse = json.decode(responseString);
+      if (response.statusCode == 201) {
+        debugPrint("Decoded JSON response: $jsonResponse");
+        // Return the actual student object
+        return {
+          'success': true,
+          'message': jsonResponse['message'],
+          'student': jsonResponse['student'],
+        };
+      } else {
+        return {'success': false, 'error': jsonResponse['message']};
+      }
+    } catch (e) {
+      debugPrint("Error while creating a student from service : $e");
+      return {'success': false, 'errors': 'Invalid response from server'};
+    }
+  }
 }
